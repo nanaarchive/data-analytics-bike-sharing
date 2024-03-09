@@ -18,8 +18,8 @@ st.sidebar.title("Dashboard")
 selected_option = st.sidebar.selectbox("Pilih Tampilan", ["Tabel", "Data Visual"])
 
 # Load your CSV data
-hour_data = pd.read_csv("hour.csv")
-day_data = pd.read_csv("day.csv")
+hour_data = pd.read_csv("data/hour.csv")
+day_data = pd.read_csv("data/day.csv")
 
 # Sidebar
 st.sidebar.title("Download Data")
