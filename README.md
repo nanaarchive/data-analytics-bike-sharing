@@ -1,5 +1,9 @@
 # data-analytics-bike-sharing
 
+| ML         | Nama                 |
+| ---        | ---                  |
+| ML-68      | Nadya Zuhria Amana   |
+
 ### Setup Run Environment
 ```
 conda create --name main-ds python=3.9
