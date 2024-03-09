@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import base64
 
 # Load data
-day_df = pd.read_csv("data\day.csv")
-hour_df = pd.read_csv("data\hour.csv")
+day_df = pd.read_csv("data/day.csv")
+hour_df = pd.read_csv("data/hour.csv")
 
 
 # Define title and styling
