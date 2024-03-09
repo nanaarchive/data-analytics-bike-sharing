@@ -69,7 +69,7 @@ elif selected_option == "Data Visual":
     """)
 
     # Load data
-    hour_data = pd.read_csv('D:\Semester 6\Bangkit\Dicoding\Analisis_Data_Nadya\data\hour.csv')
+    hour_data = pd.read_csv('data/hour.csv')
 
     # Hitung rata-rata jumlah peminjaman sepeda untuk setiap jam
     average_rentals_by_hour = hour_data.groupby('hr')['cnt'].mean()
