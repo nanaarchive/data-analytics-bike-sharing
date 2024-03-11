@@ -50,7 +50,7 @@ elif selected_option == "Data Visual":
     Bagaimana Pengaruh kondisi cuaca terhadap pola peminjaman sepeda?
     """)
     # Load data
-    merged_data = pd.read_csv('main_data.csv')
+    merged_data = pd.read_csv('dashboard/main_data.csv')
 
     # Konversi kolom 'dteday' ke tipe datetime
     merged_data['dteday'] = pd.to_datetime(merged_data['dteday'])
