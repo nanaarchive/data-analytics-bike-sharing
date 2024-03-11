@@ -41,7 +41,7 @@ if selected_option == "Tabel":
     st.write(hour_df.describe())
 
 elif selected_option == "Data Visual":
-    # Data Visual jumlah peminjaman sepeda berdasarkan hari dalam seminggu
+   # Data Visual jumlah peminjaman sepeda berdasarkan hari dalam seminggu
     # Visualisasi pengaruh kondisi cuaca terhadap jumlah peminjaman sepeda menggunakan line plot
 
     st.write(
@@ -49,27 +49,50 @@ elif selected_option == "Data Visual":
     # Hasil Visualisasi No.1
     Bagaimana Pengaruh kondisi cuaca terhadap pola peminjaman sepeda?
     """)
+    # Load data
+    merged_data = pd.read_csv('main_data.csv')
 
-    merged_data = pd.merge(hour_data, day_data, on='dteday')
+    # Konversi kolom 'dteday' ke tipe datetime
+    merged_data['dteday'] = pd.to_datetime(merged_data['dteday'])
 
-    plt.figure(figsize=(10, 6))
-    sns.lineplot(x='dteday', y='cnt_x', hue='weathersit_x', data=merged_data, estimator=sum)
-    plt.title('Perubahan Jumlah Peminjaman Sepeda berdasarkan Kondisi Cuaca')
+    # Mengelompokkan data peminjaman sepeda untuk setiap tiga bulan
+    total_rentals_by_3_months = merged_data.resample('3M', on='dteday')['cnt_x'].sum().reset_index()
+
+    # Membuat dataframe baru dengan total jumlah peminjaman sepeda untuk setiap kondisi cuaca pada setiap tiga bulan
+    total_rentals_by_weather_3_months = merged_data.groupby([pd.Grouper(key='dteday', freq='3M'), 'weathersit_x'])['cnt_x'].sum().reset_index()
+
+    # Menentukan palet warna yang sama untuk scatterplot dan lineplot
+    palette = sns.color_palette('Set2', len(total_rentals_by_weather_3_months['weathersit_x'].unique()))
+
+    # Plot the data
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Menambahkan informasi kondisi cuaca dengan warna yang berbeda
+    sns.scatterplot(data=total_rentals_by_weather_3_months, x='dteday', y='cnt_x', hue='weathersit_x', palette=palette, legend=True, s=100)
+
+    # Menghubungkan titik-titik cuaca dengan garis untuk tiap kondisi cuaca
+    for _, group_data in total_rentals_by_weather_3_months.groupby('weathersit_x'):
+        sns.lineplot(data=group_data, x='dteday', y='cnt_x', marker='o', linestyle='-')
+
+    plt.title('Pola Peminjaman Sepeda setiap Tiga Bulan dengan Kondisi Cuaca')
     plt.xlabel('Tanggal')
-    plt.ylabel('Jumlah Peminjaman Sepeda')
-    plt.legend(title='Kondisi Cuaca')
-    # Get the current figure and pass it to st.pyplot()
-    fig = plt.gcf()
+    plt.ylabel('Jumlah Total Peminjaman Sepeda')
+
+    plt.xticks(rotation=45)  # Label sumbu x sesuai dengan bulan
+
+    plt.tight_layout()  # Memperbaiki tata letak agar tidak tumpang tindih
+
+    # Display the plot in Streamlit
     st.pyplot(fig)
-    
+
     st.write(
     """
-    # Hasil Visualisasi No.2 
-    Kira-kira berapa jumlah peminjaman sepeda berdasarkan Jam?
+    # Hasil Visualisasi No.2
+    Bagaimana Pengaruh kondisi cuaca terhadap pola peminjaman sepeda?
     """)
 
     # Load data
-    hour_data = pd.read_csv('data/hour.csv')
+    hour_data = pd.read_csv("D:\Semester 6\Bangkit\Dicoding\Analisis_Data_Nadya\data\hour.csv")
 
     # Hitung rata-rata jumlah peminjaman sepeda untuk setiap jam
     average_rentals_by_hour = hour_data.groupby('hr')['cnt'].mean()
@@ -91,18 +114,21 @@ elif selected_option == "Data Visual":
     Kira-kira berapa jumlah peminjaman sepeda berdasarkan Hari?
     """)
 
-        # Ubah tipe data kolom 'dteday' menjadi datetime
-    merged_data['dteday'] = pd.to_datetime(merged_data['dteday'])
+    # Load data
+    hourly_data = pd.read_csv("D:\Semester 6\Bangkit\Dicoding\Analisis_Data_Nadya\data\hour.csv")
 
-    # Hitung rata-rata jumlah peminjaman sepeda berdasarkan hari dalam satu minggu
-    average_rentals_by_weekday = merged_data.groupby(merged_data['dteday'].dt.dayofweek)['cnt_x'].mean()
+    # Konversi kolom 'dteday' ke tipe datetime
+    hourly_data['dteday'] = pd.to_datetime(hourly_data['dteday'])
 
-    # Plot untuk rata-rata jumlah peminjaman sepeda berdasarkan hari dalam satu minggu
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.bar(average_rentals_by_weekday.index, average_rentals_by_weekday.values)
-    ax.set_title('Rata-Rata Jumlah Peminjaman Sepeda berdasarkan Hari dalam Satu Minggu')
-    ax.set_xlabel('Hari')
-    ax.set_ylabel('Rata-Rata Jumlah Peminjaman')
+    # Ambil informasi hari dari tanggal
+    hourly_data['day_of_week'] = hourly_data['dteday'].dt.day_name()
 
-    # Tampilkan plot menggunakan st.pyplot() dengan menyertakan objek figure
-    st.pyplot(fig)
+    # Hitung rata-rata jumlah peminjaman sepeda untuk setiap hari dalam seminggu
+    average_rentals_by_day = hourly_data.groupby('day_of_week')['cnt'].mean()
+
+    # Urutkan berdasarkan urutan hari dalam seminggu
+    days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    average_rentals_by_day = average_rentals_by_day.reindex(days_of_week)
+
+    # Plot the data using bar chart
+    st.bar_chart(average_rentals_by_day)
